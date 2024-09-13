@@ -48,7 +48,7 @@ check_results_destination () {
 
 check_output_destination () {
   mkdir -p ${outputDir}
-  outputDesitination = $1
+  outputDesitination=$1
   if [[ -f ${outputDestination} ]]; then
     outputDestination=${outputDir}/${topic}-${date}-$(date +%s).md
   fi
