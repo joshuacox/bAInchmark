@@ -74,11 +74,12 @@ make_header () {
 
 main () {
   check_results_destination "${resultsOutputDir}/${topic}-${date}.csv"
-  echo "model,time,topic,prompt,card,uname,date" >> ${resultsOutput}
+  echo "model,time,size,unit,topic,prompt,card,uname,date" >> ${resultsOutput}
   count_zero=0
-  for model in $(cat models)
-  do 
-    echo ${model} ${topic} ${prompt}
+  ollama_list=$(ollama list|awk '{print $1","$3","$4}'|tail -n +2)
+  while IFS="," read -r model size unit
+  do
+    echo ${model} ${size} ${unit} ${topic} ${prompt}
     ((++count_zero))
     check_output_destination "${outputDir}/${topic}-${model}-${date}.md"
     make_header
@@ -88,8 +89,8 @@ main () {
     time2=$(date +%s.%N)
     diff=$(echo "scale=40;${time2} - ${time1}" | bc)
     # add another line to our output results
-    echo "${model},${diff},${topic},${prompt},${card},${uname},${date}" |tee -a ${resultsOutput}
-  done
+    echo "${model},${diff},${size},${unit},${topic},${prompt},${card},${uname},${date}" |tee -a ${resultsOutput}
+  done <<< "$ollama_list"
 }
 
 time main 
