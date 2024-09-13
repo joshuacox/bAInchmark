@@ -1,5 +1,5 @@
 #!/bin/bash
-source lib.bash
+source libAInchmark.bash
 if [[ $# == 0 ]]; then
   echo 'using the default topic and prompt, which can be overridden'
   usage
