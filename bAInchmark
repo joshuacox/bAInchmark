@@ -1,0 +1,19 @@
+#!/bin/bash
+UNAME=$(uname -a)
+CARD=$(nvidia-smi -L|tr '\n' '-')
+TOPIC='godParticle'
+PROMPT="write me a blog post about the god particle"
+DATE=$(date -I)
+OUTPUT_DIR=output
+RESULTS_OUTPUT=$OUTPUT_DIR/results-$DATE.csv
+
+echo "model,time,topic,prompt,card,uname,date" >> $RESULTS_OUTPUT
+for i in $(cat models)
+  do 
+    echo $i $TOPIC $PROMPT
+    TIME1=$(date +%s.%N)
+    ollama run $i  "$PROMPT" | tee $OUTPUT_DIR/"$TOPIC-$i.txt"
+    TIME2=$(date +%s.%N)
+    DIFF=$(echo "scale=40;$TIME2 - $TIME1" | bc)
+    echo "$i,$DIFF,$TOPIC,$PROMPT,$CARD,$UNAME,$DATE" |tee -a $RESULTS_OUTPUT
+  done
