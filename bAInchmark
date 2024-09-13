@@ -1,19 +1,34 @@
 #!/bin/bash
-UNAME=$(uname -a)
-CARD=$(nvidia-smi -L|tr '\n' '-')
-TOPIC='godParticle'
-PROMPT="write me a blog post about the god particle"
-DATE=$(date -I)
-OUTPUT_DIR=output
-RESULTS_OUTPUT=$OUTPUT_DIR/results-$DATE.csv
+uname=$(uname -a)
+card=$(nvidia-smi -L|tr '\n' '-')
+topic='godParticle'
+prompt="write me a blog post about the god particle"
+date=$(date -I)
+outputDir=output
+results_outputDir=results
+resultsOutput=${results_outputDir}/results-${date}.csv
 
-echo "model,time,topic,prompt,card,uname,date" >> $RESULTS_OUTPUT
-for i in $(cat models)
+echo "model,time,topic,prompt,card,uname,date" >> ${resultsOutput}
+count_zero=0
+for model in $(cat models)
   do 
-    echo $i $TOPIC $PROMPT
-    TIME1=$(date +%s.%N)
-    ollama run $i  "$PROMPT" | tee $OUTPUT_DIR/"$TOPIC-$i.txt"
-    TIME2=$(date +%s.%N)
-    DIFF=$(echo "scale=40;$TIME2 - $TIME1" | bc)
-    echo "$i,$DIFF,$TOPIC,$PROMPT,$CARD,$UNAME,$DATE" |tee -a $RESULTS_OUTPUT
+    echo ${model} ${topic} ${prompt}
+    ((count_zero++))
+    # make a md header like so:
+    # $topic #$countzero
+    ### written by $model
+    echo "# ${topic} #$count_zero" | tee -a ${outputDir}/"${topic}-${model}.md"
+    echo "" | tee -a ${outputDir}/"${topic}-${model}.md"
+    echo "### writen by ${model}" | tee -a ${outputDir}/"${topic}-${model}.md"
+    echo "" | tee -a ${outputDir}/"${topic}-${model}.md"
+    # time our run
+    time1=$(date +%s.%N)
+    ollama run ${model}  "${prompt}" | tee -a ${outputDir}/"${topic}-${model}.md"
+    time2=$(date +%s.%N)
+
+    diff=$(echo "scale=40;${time2} - ${time1}" | bc)
+    # add another line to our output results
+    echo "${model},${diff},${topic},${prompt},${card},${uname},${date}" |tee -a ${resultsOutput}
   done
+
+time main 
