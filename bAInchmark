@@ -5,8 +5,13 @@ topic='godParticle'
 prompt="write me a blog post about the god particle"
 date=$(date -I)
 outputDir=output
-results_outputDir=results
-resultsOutput=${results_outputDir}/results-${date}.csv
+resultsOutputDir=results
+mkdir -p ${outputDir}
+mkdir -p ${resultsOutputDir}
+resultsOutput=${resultsOutputDir}/results-${date}.csv
+if [[ -f ${resultsOutputDir} ]]; then
+  resultsOutput=${resultsOutputDir}/results-${date}-$(date +%s.%N).csv
+fi
 
 echo "model,time,topic,prompt,card,uname,date" >> ${resultsOutput}
 count_zero=0
