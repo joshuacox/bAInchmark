@@ -19,7 +19,6 @@ main () {
   set -x
   collect_data
   check_results_destination "${resultsOutputDir}/${topic}-${date}.csv"
-  echo "model,time,size,unit,topic,prompt,card,uname,date" >> ${resultsOutput}
   count_zero=0
   while_read_ollama_runner
 }
