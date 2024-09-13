@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env bash
 set -eu
 # These variables can be overridden by env
 : ${date:=$(date -I)}
@@ -10,27 +10,31 @@ set -eu
 usage () {
   echo "Don't forget the quotes!"
   echo 'usage:'
-  echo "$0 '$topic' '$prompt'"
+  echo "$0 'topic' 'prompt'"
 }
 
-if [[ $# == 0 ]]; then
-  echo 'using the default topic and prompt, which can be overridden'
-  usage
-  sleep 1
-elif [[ $# == 1 ]]; then
-  usage
-  exit 1
-elif [[ $# == 2 ]]; then
-  topic=$1
-  prompt="$2"
-else
-  usage
-  exit 1
-fi
+check_args () {
+  if [[ $# == 0 ]]; then
+    echo 'using the default topic and prompt, which can be overridden'
+    usage
+    sleep 1
+  elif [[ $# == 1 ]]; then
+    usage
+    exit 1
+  elif [[ $# == 2 ]]; then
+    topic=$1
+    prompt="$2"
+  else
+    usage
+    exit 1
+  fi
+}
 
-# collect some machine data
-uname=$(uname -a)
-card=$(nvidia-smi -L|tr '\n' '-')
+collect_data () {
+  # collect some machine data
+  uname=$(uname -a)
+  card=$(nvidia-smi -L|tr '\n' '-')
+}
 
 check_results_destination () {
   mkdir -p ${resultsOutputDir}
@@ -72,25 +76,34 @@ make_header () {
   echo "" | tee -a ${outputDestination}
 }
 
-main () {
-  check_results_destination "${resultsOutputDir}/${topic}-${date}.csv"
-  echo "model,time,size,unit,topic,prompt,card,uname,date" >> ${resultsOutput}
-  count_zero=0
+while_read_ollama_runner () {
   ollama_list=$(ollama list|awk '{print $1","$3","$4}'|tail -n +2)
   while IFS="," read -r model size unit
   do
-    echo ${model} ${size} ${unit} ${topic} ${prompt}
-    ((++count_zero))
-    check_output_destination "${outputDir}/${topic}-${model}-${date}.md"
-    make_header
-    # time our run
-    time1=$(date +%s.%N)
-    ollama run ${model}  "${prompt}" | tee -a ${outputDestination}
-    time2=$(date +%s.%N)
-    diff=$(echo "scale=40;${time2} - ${time1}" | bc)
-    # add another line to our output results
-    echo "${model},${diff},${size},${unit},${topic},${prompt},${card},${uname},${date}" |tee -a ${resultsOutput}
+    common_runner
   done <<< "$ollama_list"
 }
 
-time main 
+common_runner () {
+  echo ${model} ${size} ${unit} ${topic} ${prompt}
+  ((++count_zero))
+  check_output_destination "${outputDir}/${topic}-${model}-${date}.md"
+  make_header
+  # time our run
+  time1=$(date +%s.%N)
+  ollama run ${model}  "${prompt}" | tee -a ${outputDestination}
+  time2=$(date +%s.%N)
+  diff=$(echo "scale=40;${time2} - ${time1}" | bc)
+  # add another line to our output results
+  echo "${model},${diff},${size},${unit},${topic},${prompt},${card},${uname},${date}" |tee -a ${resultsOutput}
+}
+
+for_model_ollama_runner () {
+  ollama_list=$(ollama list|awk '{print $1}'|tail -n +2)
+  for model in $ollama_list
+  do 
+    size=$(ollama list|grep ${model}|awk '{print $3}')
+    unit=$(ollama list|grep ${model}|awk '{print $4}')
+    common_runner
+  done
+}
