@@ -1,39 +1,93 @@
 #!/bin/bash
-uname=$(uname -a)
-card=$(nvidia-smi -L|tr '\n' '-')
-topic='godParticle'
-prompt="write me a blog post about the god particle"
-date=$(date -I)
-outputDir=output
-resultsOutputDir=results
-mkdir -p ${outputDir}
-mkdir -p ${resultsOutputDir}
-resultsOutput=${resultsOutputDir}/results-${date}.csv
-if [[ -f ${resultsOutputDir} ]]; then
-  resultsOutput=${resultsOutputDir}/results-${date}-$(date +%s.%N).csv
+# These variables can be overridden by env
+: ${date:=$(date -I)}
+: ${outputDir:=output}
+: ${resultsOutputDir:=results}
+: ${topic:='godParticle'}
+: ${prompt:="write me a blog post about the god particle"}
+
+usage () {
+  echo "Don't forget the quotes!"
+  echo 'usage:'
+  echo "$0 '$topic' '$prompt'"
+}
+
+if [[ $# == 0 ]]; then
+  echo 'using the default topic and prompt, which can be overridden'
+  usage
+  sleep 1
+elif [[ $# == 1 ]]; then
+  usage
+  exit 1
+elif [[ $# == 2 ]]; then
+  topic=$1
+  prompt="$2"
+else
+  usage
+  exit 1
 fi
 
-echo "model,time,topic,prompt,card,uname,date" >> ${resultsOutput}
-count_zero=0
-for model in $(cat models)
+# collect some machine data
+uname=$(uname -a)
+card=$(nvidia-smi -L|tr '\n' '-')
+
+check_results_destination () {
+  mkdir -p ${resultsOutputDir}
+  resultsOutput=$1
+  if [[ -f ${resultsOutput} ]]; then
+    resultsOutput=${resultsOutputDir}/${topic}-${date}-$(date +%s).csv
+  fi
+  if [[ -f ${resultsOutput} ]]; then
+    resultsOutput=${resultsOutputDir}/${topic}-${date}-$(date +%s.%N).csv
+  fi
+  if [[ -f ${resultsOutput} ]]; then
+    echo 'something is wrong will not overwrite results'
+    exit 1
+  fi
+}
+
+check_output_destination () {
+  mkdir -p ${outputDir}
+  outputDesitination = $1
+  if [[ -f ${outputDestination} ]]; then
+    outputDestination=${outputDir}/${topic}-${date}-$(date +%s).md
+  fi
+  if [[ -f ${outputDestination} ]]; then
+    outputDestination=${outputDir}/${topic}-${date}-$(date +%s.%N).md
+  fi
+  if [[ -f ${outputDestination} ]]; then
+    echo 'something is wrong will not overwrite output'
+    exit 1
+  fi
+}
+make_header () {
+  # make a md header like so:
+  # $topic #$countzero
+  ### written by $model
+  echo "# ${topic} #$count_zero" | tee -a ${outputDestination}
+  echo "" | tee -a ${outputDestination}
+  echo "### writen by ${model}" | tee -a ${outputDestination}
+  echo "" | tee -a ${outputDestination}
+}
+
+main () {
+  check_results_destination "${resultsOutputDir}/${topic}-${date}.csv"
+  echo "model,time,topic,prompt,card,uname,date" >> ${resultsOutput}
+  count_zero=0
+  for model in $(cat models)
   do 
     echo ${model} ${topic} ${prompt}
     ((count_zero++))
-    # make a md header like so:
-    # $topic #$countzero
-    ### written by $model
-    echo "# ${topic} #$count_zero" | tee -a ${outputDir}/"${topic}-${model}.md"
-    echo "" | tee -a ${outputDir}/"${topic}-${model}.md"
-    echo "### writen by ${model}" | tee -a ${outputDir}/"${topic}-${model}.md"
-    echo "" | tee -a ${outputDir}/"${topic}-${model}.md"
+    check_output_destination "${outputDir}/${topic}-${model}-${date}.md"
+    make_header
     # time our run
     time1=$(date +%s.%N)
-    ollama run ${model}  "${prompt}" | tee -a ${outputDir}/"${topic}-${model}.md"
+    ollama run ${model}  "${prompt}" | tee -a ${outputDestination}
     time2=$(date +%s.%N)
-
     diff=$(echo "scale=40;${time2} - ${time1}" | bc)
     # add another line to our output results
     echo "${model},${diff},${topic},${prompt},${card},${uname},${date}" |tee -a ${resultsOutput}
   done
+}
 
 time main 
