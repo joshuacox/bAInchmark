@@ -19,13 +19,9 @@ def get_env_var(env_var, default_value):
         this_env_var = default_value
     return this_env_var
 
-date = datetime.today().strftime('%Y-%m-%d')
+# date = datetime.today().strftime('%Y-%m-%d')
 outputDir = get_env_var('outputDir','./output')
 resultsOutputDir = get_env_var('resultsOutputDir','./results')
-topic = get_env_var('topic','godParticle')
-prompt = get_env_var('prompt',"write me a blog post about the god particle")
-#prompt = get_env_var('prompt',"what is two plus three?")
-#prompt = get_env_var('prompt',"write me a hikou about snowboarding?")
 uname = subprocess.run(["uname", "-a"], capture_output=True, text=True).stdout
 card = subprocess.run(["nvidia-smi", "-L"], capture_output=True, text=True).stdout
 ollama_host = get_env_var('OLLAMA_HOST','localhost')
@@ -36,7 +32,8 @@ def usage():
     print('usage:')
     print(f"{sys.argv[0]} 'topic' 'prompt'")
 
-def check_results_destination(resultsOutput):
+def check_results_destination(resultsOutput, topic):
+    date = datetime.today().strftime('%Y-%m-%d')
     try:
         os.mkdir(resultsOutputDir)
     except FileExistsError:
@@ -53,7 +50,8 @@ def check_results_destination(resultsOutput):
     return resultsOutput 
     #echo "model,time,size,lines,words,chars,unit,topic,prompt,card,uname,date" >> ${resultsOutput}
 
-def check_output_destination(outputDestination):
+def check_output_destination(outputDestination, topic):
+    date = datetime.today().strftime('%Y-%m-%d')
     try:
         os.mkdir(outputDir)
     except FileExistsError:
@@ -107,8 +105,9 @@ def make_header(outputDestination, count_zero, topic, model):
             tmpfile.seek(0)
             print(tmpfile.read())
 
-def while_read_ollama_runner():
-    resultsOutput = check_results_destination(f'{resultsOutputDir}/{topic}-{date}.csv')
+def while_read_ollama_runner(topic, prompt):
+    date = datetime.today().strftime('%Y-%m-%d')
+    resultsOutput = check_results_destination(f'{resultsOutputDir}/{topic}-{date}.csv', topic)
     with open(resultsOutput, 'w', newline='') as csvfile:
         results_writer = csv.writer(csvfile, delimiter=',',
             quotechar='"', quoting=csv.QUOTE_MINIMAL)
@@ -119,7 +118,7 @@ def while_read_ollama_runner():
     count_zero = 0
     for model in ollama_list['models']:
         count_zero += 1
-        outputDestination = check_output_destination(f"{outputDir}/{topic}-{model['name']}-{date}.md")
+        outputDestination = check_output_destination(f"{outputDir}/{topic}-{model['name']}-{date}.md", topic)
         make_header(outputDestination, count_zero, topic, model['name'])
         time1 = datetime.today().strftime('%s.%f')
         response = ollama_client.chat(model=model['name'], messages=[
