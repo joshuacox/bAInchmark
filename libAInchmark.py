@@ -1,4 +1,4 @@
-#!/usr/bin/env python
+#!/usr/bin/env python3
 import os, sys, csv, subprocess, tempfile
 from dotenv import load_dotenv
 from datetime import datetime
