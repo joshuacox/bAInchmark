@@ -1,6 +1,9 @@
 #!/usr/bin/env python3
 import sys
-import libAInchmark as bain
+#import libAInchmark as bain
+import libAInchmarker
+#from libAInchmarker import bAInchmarker
+bain = libAInchmarker.bAInchmarker()
 topic = bain.get_env_var('topic','godParticle')
 prompt = bain.get_env_var('prompt',"write me a blog post about the god particle")
 #prompt = get_env_var('prompt',"what is two plus three?")
