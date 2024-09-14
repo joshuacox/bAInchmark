@@ -112,7 +112,7 @@ def while_read_ollama_runner(topic, prompt):
         results_writer = csv.writer(csvfile, delimiter=',',
             quotechar='"', quoting=csv.QUOTE_MINIMAL)
         results_writer.writerow(['model', 'total_duration', 'lines', 'words', 'chars', 'size', 'size_gib',
-        'size_gb', 'topic', 'prompt', 'card', 'uname', 'load_duration', 'eval_duration',
+        'size_gb', 'topic', 'prompt', 'card', 'uname', 'load_duration', 'eval_duration', 'outputDestination',
         'prompt_eval_duration', 'created_at', 'done_reason', 'done', 'prompt_eval_count', 'eval_count'])
     ollama_list = ollama_client.list()
     count_zero = 0
@@ -153,5 +153,5 @@ def while_read_ollama_runner(topic, prompt):
             results_writer = csv.writer(csvfile, delimiter=',',
                 quotechar='"', quoting=csv.QUOTE_MINIMAL)
             results_writer.writerow([model['name'], total_duration, lines, words, chars, size, size_gib,
-            size_gb, topic, prompt, card, uname, load_duration, eval_duration, 
+            size_gb, topic, prompt, card, uname, load_duration, eval_duration, outputDestination,
             prompt_eval_duration, created_at, done_reason, done, prompt_eval_count, eval_count])
