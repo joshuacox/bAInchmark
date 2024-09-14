@@ -22,24 +22,14 @@ def get_env_var(env_var, default_value):
 date = datetime.today().strftime('%Y-%m-%d')
 outputDir = get_env_var('outputDir','./output')
 resultsOutputDir = get_env_var('resultsOutputDir','./results')
-#topic = get_env_var('topic','godParticle')
-topic = get_env_var('topic','summer')
-#prompt = get_env_var('prompt',"write me a blog post about the god particle")
-# prompt = get_env_var('prompt',"what is two plus three?")
-prompt = get_env_var('prompt',"write me a hikou about snowboarding?")
+topic = get_env_var('topic','godParticle')
+prompt = get_env_var('prompt',"write me a blog post about the god particle")
+#prompt = get_env_var('prompt',"what is two plus three?")
+#prompt = get_env_var('prompt',"write me a hikou about snowboarding?")
 uname = subprocess.run(["uname", "-a"], capture_output=True, text=True).stdout
 card = subprocess.run(["nvidia-smi", "-L"], capture_output=True, text=True).stdout
-
 ollama_host = get_env_var('OLLAMA_HOST','localhost')
 ollama_client = Client(host=f'http://{ollama_host}:11434')
-# response = ollama_client.chat(model='llama3.1', messages=[
-#   {
-#     'role': 'user',
-#     'content': 'Why is the sky blue?',
-#   },
-# ])
-
-### event horizon
 
 def usage():
     print("Don't forget the quotes!")
@@ -121,8 +111,10 @@ def while_read_ollama_runner():
     resultsOutput = check_results_destination(f'{resultsOutputDir}/{topic}-{date}.csv')
     with open(resultsOutput, 'w', newline='') as csvfile:
         results_writer = csv.writer(csvfile, delimiter=',',
-                                quotechar='"', quoting=csv.QUOTE_MINIMAL)
-        results_writer.writerow(['model', 'total_duration', 'lines', 'words', 'chars', 'size', 'size_gib', 'size_gb', 'topic', 'prompt', 'card', 'uname', 'load_duration', 'eval_duration', 'prompt_eval_duration', 'created_at', 'done_reason', 'done', 'prompt_eval_count', 'eval_count'])
+            quotechar='"', quoting=csv.QUOTE_MINIMAL)
+        results_writer.writerow(['model', 'total_duration', 'lines', 'words', 'chars', 'size', 'size_gib',
+        'size_gb', 'topic', 'prompt', 'card', 'uname', 'load_duration', 'eval_duration',
+        'prompt_eval_duration', 'created_at', 'done_reason', 'done', 'prompt_eval_count', 'eval_count'])
     ollama_list = ollama_client.list()
     count_zero = 0
     for model in ollama_list['models']:
@@ -160,5 +152,7 @@ def while_read_ollama_runner():
 
         with open(resultsOutput, 'a', newline='') as csvfile:
             results_writer = csv.writer(csvfile, delimiter=',',
-                                    quotechar='"', quoting=csv.QUOTE_MINIMAL)
-            results_writer.writerow([model['name'], total_duration, lines, words, chars, size, size_gib, size_gb, topic, prompt, card, uname, load_duration, eval_duration, prompt_eval_duration, created_at, done_reason, done, prompt_eval_count, eval_count])
+                quotechar='"', quoting=csv.QUOTE_MINIMAL)
+            results_writer.writerow([model['name'], total_duration, lines, words, chars, size, size_gib,
+            size_gb, topic, prompt, card, uname, load_duration, eval_duration, 
+            prompt_eval_duration, created_at, done_reason, done, prompt_eval_count, eval_count])
