@@ -7,10 +7,10 @@ from ollama import Client
 def get_env_var(env_var, default_value):
     try:
         if os.getenv(env_var):
-            this_env_var = int(os.getenv(env_var))
+            this_env_var = os.getenv(env_var)
         elif load_dotenv():
             if os.getenv(env_var):
-                this_env_var = int(os.getenv(env_var))
+                this_env_var = os.getenv(env_var)
             else:
                 this_env_var = default_value
         else:
