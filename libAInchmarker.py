@@ -9,8 +9,8 @@ class bAInchmarker:
     # date = datetime.today().strftime('%Y-%m-%d')
         self.outputDir = self.get_env_var('outputDir','./output')
         self.resultsOutputDir = self.get_env_var('resultsOutputDir','./results')
-        self.uname = subprocess.run(["uname", "-a"], capture_output=True, text=True).stdout
-        self.card = subprocess.run(["nvidia-smi", "-L"], capture_output=True, text=True).stdout
+        self.uname = subprocess.run(["uname", "-a"], capture_output=True, text=True).stdout.rstrip()
+        self.card = subprocess.run(["nvidia-smi", "-L"], capture_output=True, text=True).stdout.rstrip()
         self.ollama_host = self.get_env_var('OLLAMA_HOST','localhost')
         self.ollama_client = Client(host=f'http://{self.ollama_host}:11434')
 
@@ -89,17 +89,17 @@ class bAInchmarker:
             thisTemp.seek(0)
             print(thisTemp.read())
             print(thisTemp.name)
-            tmpdirname = subprocess.run(["mktemp", "-d"], capture_output=True, text=True).stdout
-            tmp_file = tmpdirname.rstrip() + "/tmpfile"
+            tmpdirname = subprocess.run(["mktemp", "-d"], capture_output=True, text=True).stdout.rstrip()
+            tmp_file = tmpdirname + "/tmpfile"
             print(tmp_file)
             with open(tmp_file, 'a+') as tmpfile:
                 tmpfile.write(response['message']['content'])
                 tmpfile.seek(0)
-                echo1 = subprocess.run(["echo", "wc", "--lines", tmp_file], capture_output=True, text=True).stdout
+                echo1 = subprocess.run(["echo", "wc", "--lines", tmp_file], capture_output=True, text=True).stdout.rstrip()
                 print("echo1" + echo1)
-                lines = subprocess.run(["wc", "--lines", tmp_file], capture_output=True, text=True).stdout
-                words = subprocess.run(["wc", "--words", tmp_file], capture_output=True, text=True).stdout
-                chars = subprocess.run(["wc", "--chars", tmp_file], capture_output=True, text=True).stdout
+                lines = subprocess.run(["wc", "--lines", tmp_file], capture_output=True, text=True).stdout.rstrip()
+                words = subprocess.run(["wc", "--words", tmp_file], capture_output=True, text=True).stdout.rstrip()
+                chars = subprocess.run(["wc", "--chars", tmp_file], capture_output=True, text=True).stdout.rstrip()
                 print(lines)
                 print(f'lines = {lines}')
                 print(f'words = {words}')
