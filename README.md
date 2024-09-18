@@ -50,3 +50,9 @@ Each individual response is recorded in the outpout directory and look like this
 ### writen by llama3.1:latest
 
 The letter 'R' appears three times in the word "strawberry".
+
+### Bash conversion
+
+This started out as a bash script and was converted to python.  The bash is left in here for now to illustrate the problem I ran into:
+
+#1
