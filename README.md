@@ -43,7 +43,7 @@ nous-hermes2:latest,3.460305619,1,9,53,6072407285,5.655369986779988,6.072407285,
 
 ### Output
 
-Each individual response is record in the outpout directory and look like this:
+Each individual response is recorded in the outpout directory and look like this:
 
 # strawberry #16
 
