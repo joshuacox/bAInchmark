@@ -1,7 +1,7 @@
 # bAInchmark
 AI benchmarking
 
-This is a tool to collect information on how various prompts run on all install models in ollama.
+This is a tool to collect information on how various prompts run on all installed models in ollama.
 
 ### Usage
 
