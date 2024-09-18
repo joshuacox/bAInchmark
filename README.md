@@ -45,11 +45,13 @@ nous-hermes2:latest,3.460305619,1,9,53,6072407285,5.655369986779988,6.072407285,
 
 Each individual response is recorded in the outpout directory and look like this:
 
+```
 # strawberry #16
 
 ### writen by llama3.1:latest
 
 The letter 'R' appears three times in the word "strawberry".
+```
 
 ### Bash conversion
 
