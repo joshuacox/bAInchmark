@@ -55,4 +55,4 @@ The letter 'R' appears three times in the word "strawberry".
 
 This started out as a bash script and was converted to python.  The bash is left in here for now to illustrate the problem I ran into:
 
-#1
+[issue #1](https://github.com/joshuacox/bAInchmark/issues/1)
