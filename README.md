@@ -10,7 +10,7 @@ This is a tool to collect information on how various prompts run on all installe
 
 e.g.
 
-./bAInchmark.py "godParticle" "write me a blog post about the god particle"
+./bAInchmark.py 'strawberry' 'Count the number of times that R occurs in the word "strawberry"'
 
 The results will be in the results directory, and each individual output is saved in the output directory.
 
