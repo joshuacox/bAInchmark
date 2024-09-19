@@ -118,27 +118,36 @@ class bAInchmarker:
             'prompt_eval_duration', 'created_at', 'done_reason', 'done', 'prompt_eval_count', 'eval_count'])
         ollama_list = self.ollama_client.list()
         count_zero = 0
+
         for model in ollama_list['models']:
+            # Pre increment this so that we begin with 1 for our first ouput
             count_zero += 1
+
+            # Each loop we need to check to make sure our output destination is vacant
             outputDestination = self.check_output_destination(f"{self.outputDir}/{topic}-{model['name']}-{date}.md", topic)
             self.make_header(outputDestination, count_zero, topic, model['name'])
-            time1 = datetime.today().strftime('%s.%f')
+
             response = self.ollama_client.chat(model=model['name'], messages=[
               {
                 'role': 'user',
                 'content': prompt,
               },
             ])
+
             print(response)
-            time2 = datetime.today().strftime('%s.%f')
+
+            # Write the output as a markdown file
             with open(outputDestination, 'a+') as file:
                 file.write(response['message']['content'])
+
+            # Gather data
+            # we divide durations by 1_000_000_000 to get it in seconds
+            # to be more human readable
+            # print(float(total_duration) / 1_000_000_000.0)
             load_duration = response['load_duration'] / 1_000_000_000.0
             eval_duration = response['eval_duration'] / 1_000_000_000.0
             total_duration = response['total_duration'] / 1_000_000_000.0
             prompt_eval_duration = response['prompt_eval_duration'] / 1_000_000_000.0
-            # print(float(total_duration) / 1_000_000_000.0)
-            # print(float(time2) - float(time1))
             size = model['size']
             size_gb = ( model['size'] / ( 10 ** 9 ))
             size_gib = ( model['size'] / ( 2 ** 30 ))
@@ -151,6 +160,7 @@ class bAInchmarker:
             prompt_eval_count = response['prompt_eval_count']
             eval_count = response['eval_count']
 
+            # Write to our results CSV file
             with open(resultsOutput, 'a', newline='') as csvfile:
                 results_writer = csv.writer(csvfile, delimiter=',',
                     quotechar='"', quoting=csv.QUOTE_MINIMAL)
