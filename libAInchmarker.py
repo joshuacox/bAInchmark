@@ -105,12 +105,13 @@ class bAInchmarker:
     def runner(self, topic, prompt):
         date = datetime.today().strftime('%Y-%m-%d')
         resultsOutput = self.check_results_destination(f'{self.resultsOutputDir}/{topic}-{date}.csv', topic)
-        with open(resultsOutput, 'w', newline='') as csvfile:
-            results_writer = csv.writer(csvfile, delimiter=',',
-                quotechar='"', quoting=csv.QUOTE_MINIMAL)
-            results_writer.writerow(['model', 'total_duration', 'lines', 'words', 'chars', 'size', 'size_gib',
-            'size_gb', 'topic', 'prompt', 'card', 'uname', 'load_duration', 'eval_duration', 'outputDestination',
-            'prompt_eval_duration', 'created_at', 'done_reason', 'done', 'prompt_eval_count', 'eval_count'])
+        with open(resultsOutput, 'w') as csvfile:
+            fieldnames = ['model', 'total_duration', 'lines', 'words', 'chars', 'size', 'size_gib',
+                          'size_gb', 'topic', 'prompt', 'card', 'uname', 'load_duration', 'eval_duration',
+                          'outputDestination', 'prompt_eval_duration', 'created_at', 'done_reason', 'done',
+                          'prompt_eval_count', 'eval_count']
+            results_writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+            results_writer.writeheader()
         ollama_list = self.ollama_client.list()
         count_zero = 0
 
@@ -157,8 +158,31 @@ class bAInchmarker:
 
             # Write to our results CSV file
             with open(resultsOutput, 'a', newline='') as csvfile:
-                results_writer = csv.writer(csvfile, delimiter=',',
-                    quotechar='"', quoting=csv.QUOTE_MINIMAL)
-                results_writer.writerow([model['name'], total_duration, lines, words, chars, size, size_gib,
-                size_gb, topic, prompt, self.card, self.uname, load_duration, eval_duration, outputDestination,
-                prompt_eval_duration, created_at, done_reason, done, prompt_eval_count, eval_count])
+                fieldnames = ['name', 'total_duration', 'lines', 'words', 'chars', 'size', 'size_gib',
+                              'size_gb', 'topic', 'prompt', 'card', 'uname', 'load_duration',
+                              'eval_duration', 'outputDestination', 'prompt_eval_duration',
+                              'created_at', 'done_reason', 'done', 'prompt_eval_count', 'eval_count']
+                writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+                writer.writerow({
+                    'name': model['name'],
+                    'total_duration': total_duration,
+                    'lines': lines,
+                    'words': words,
+                    'chars': chars,
+                    'size': size,
+                    'size_gib': size_gib,
+                    'size_gb': size_gb,
+                    'topic': topic,
+                    'prompt': prompt,
+                    'card': self.card,
+                    'uname': self.uname,
+                    'load_duration': load_duration,
+                    'eval_duration': eval_duration,
+                    'outputDestination': outputDestination,
+                    'prompt_eval_duration': prompt_eval_duration,
+                    'created_at': created_at,
+                    'done_reason': done_reason,
+                    'done': done,
+                    'prompt_eval_count': prompt_eval_count,
+                    'eval_count': eval_count
+                })
