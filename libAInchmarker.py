@@ -35,15 +35,15 @@ class bAInchmarker:
         thisDestination = f'{thisDir}/{thisName}'
         date = datetime.today().strftime('%Y-%m-%d')
         try:
-            os.mkdir(self.thisDir)
+            os.mkdir(thisDir)
         except FileExistsError:
             pass
         if os.path.isfile(thisDestination):
             date=datetime.today().strftime('%Y-%m-%d-%s')
-            thisDestination=f'{self.thisDir}/{topic}-{date}.md'
+            thisDestination=f'{thisDir}/{topic}-{date}.md'
         if os.path.isfile(thisDestination):
             date=datetime.today().strftime('%Y-%m-%d-%s.%f')
-            thisDestination=f'{self.thisDir}/{topic}-{date}.md'
+            thisDestination=f'{thisDir}/{topic}-{date}.md'
         if os.path.isfile(thisDestination):
             print(f'something is wrong will not overwrite {thisDestination}')
             exit(1)
