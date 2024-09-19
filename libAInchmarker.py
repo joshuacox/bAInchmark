@@ -189,7 +189,6 @@ class bAInchmarker:
                     'uname_p': self.uname_p,
                     'uname_i': self.uname_i,
                     'uname_o': self.uname_o,
-                    'uname_replaceMe': self.uname_replaceMe,
                     'load_duration': load_duration,
                     'eval_duration': eval_duration,
                     'outputDestination': outputDestination,
