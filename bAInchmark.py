@@ -9,4 +9,4 @@ if len(sys.argv) == 3:
     prompt=sys.argv[2]
 else:
     bain.usage()
-bain.while_read_ollama_runner(topic, prompt)
+bain.runner(topic, prompt)

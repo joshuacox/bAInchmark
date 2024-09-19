@@ -107,7 +107,7 @@ class bAInchmarker:
                 tmpfile.seek(0)
                 print(tmpfile.read())
 
-    def while_read_ollama_runner(self, topic, prompt):
+    def runner(self, topic, prompt):
         date = datetime.today().strftime('%Y-%m-%d')
         resultsOutput = self.check_results_destination(f'{self.resultsOutputDir}/{topic}-{date}.csv', topic)
         with open(resultsOutput, 'w', newline='') as csvfile:
