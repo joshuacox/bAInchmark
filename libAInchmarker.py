@@ -31,9 +31,7 @@ class bAInchmarker:
 
 
     def usage(self):
-        print("Don't forget the quotes!")
-        print('usage:')
-        print(f"{sys.argv[0]} 'topic' 'prompt'")
+        print(f"Don't forget the quotes!\nusage:\n{sys.argv[0]} 'topic' 'prompt'")
 
     def check_results_destination(self, resultsOutput, topic):
         date = datetime.today().strftime('%Y-%m-%d')
@@ -83,12 +81,9 @@ class bAInchmarker:
             exit(1)
 
         def tempDebug():
-            thisTemp = tempfile.TemporaryFile(mode='w+')
-            thisTemp.write(response['message']['content'])
-            #words=$(wc --words  ${outputDestination})
-            thisTemp.seek(0)
-            print(thisTemp.read())
-            print(thisTemp.name)
+            # DEPRECATED
+            # this function was used to see if wc got different results than the python did in counting  
+            # can be deleted in the future, but it is interesting
             tmpdirname = subprocess.run(["mktemp", "-d"], capture_output=True, text=True).stdout.rstrip()
             tmp_file = tmpdirname + "/tmpfile"
             print(tmp_file)
