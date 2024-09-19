@@ -79,7 +79,7 @@ class bAInchmarker:
 
     def runner(self, topic, prompt):
         date = datetime.today().strftime('%Y-%m-%d')
-        resultsOutput = self.check_results_destination(f'{topic}-{date}.csv', self.resultsOutputDir, topic)
+        resultsOutput = self.check_destination(f'{topic}-{date}.csv', self.resultsOutputDir, topic)
         with open(resultsOutput, 'w') as csvfile:
             fieldnames = ['model', 'total_duration', 'lines', 'words', 'chars', 'size', 'size_gib',
                           'size_gb', 'topic', 'prompt', 'card', 'uname', 'load_duration', 'eval_duration',
