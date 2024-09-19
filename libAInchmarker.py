@@ -8,7 +8,6 @@ class bAInchmarker:
     def __init__(self):
         self.outputDir = self.get_env_var('outputDir','./output')
         self.resultsOutputDir = self.get_env_var('resultsOutputDir','./results')
-        self.uname_a = subprocess.run(["uname", "-a"], capture_output=True, text=True).stdout.rstrip()
         self.uname_s = subprocess.run(["uname", "-s"], capture_output=True, text=True).stdout.rstrip()
         self.uname_n = subprocess.run(["uname", "-n"], capture_output=True, text=True).stdout.rstrip()
         self.uname_r = subprocess.run(["uname", "-r"], capture_output=True, text=True).stdout.rstrip()
@@ -31,7 +30,6 @@ class bAInchmarker:
                         'topic',
                         'prompt',
                         'card',
-                        'uname_a',
                         'uname_s',
                         'uname_n',
                         'uname_r',
@@ -180,7 +178,6 @@ class bAInchmarker:
                     'topic': topic,
                     'prompt': prompt,
                     'card': self.card,
-                    'uname_a': self.uname_a,
                     'uname_s': self.uname_s,
                     'uname_n': self.uname_n,
                     'uname_r': self.uname_r,
