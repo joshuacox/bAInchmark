@@ -12,9 +12,9 @@ elif len(sys.argv) == 1:
     time.sleep(1)
     print('ctrl-C to stop now or proceeding with the default topic and prompt')
     time.sleep(1)
-    print(f'topic = {topic}'
+    print(f'topic = {topic}')
     time.sleep(1)
-    print(f'prompt = {prompt}'
+    print(f'prompt = {prompt}')
     time.sleep(1)
 else:
     bain.usage()
