@@ -1,12 +1,11 @@
 #!/usr/bin/env python3
-import os, sys, csv, subprocess, tempfile
+import os, sys, csv, subprocess
 from dotenv import load_dotenv
 from datetime import datetime
 from ollama import Client
 
 class bAInchmarker:
     def __init__(self):
-    # date = datetime.today().strftime('%Y-%m-%d')
         self.outputDir = self.get_env_var('outputDir','./output')
         self.resultsOutputDir = self.get_env_var('resultsOutputDir','./results')
         self.uname = subprocess.run(["uname", "-a"], capture_output=True, text=True).stdout.rstrip()
@@ -29,44 +28,26 @@ class bAInchmarker:
             this_env_var = default_value
         return this_env_var
 
-
     def usage(self):
         print(f"Don't forget the quotes!\nusage:\n{sys.argv[0]} 'topic' 'prompt'")
 
-    def check_results_destination(self, resultsOutput, topic):
+    def check_destination(self, thisName, thisDir, topic):
+        thisDestination = f'{thisDir}/{thisName}'
         date = datetime.today().strftime('%Y-%m-%d')
         try:
-            os.mkdir(self.resultsOutputDir)
+            os.mkdir(self.thisDir)
         except FileExistsError:
             pass
-        if os.path.isfile(resultsOutput):
+        if os.path.isfile(thisDestination):
             date=datetime.today().strftime('%Y-%m-%d-%s')
-            resultsOutput=f'{self.resultsOutputDir}/{topic}-{date}.csv'
-        if os.path.isfile(resultsOutput):
+            thisDestination=f'{self.thisDir}/{topic}-{date}.md'
+        if os.path.isfile(thisDestination):
             date=datetime.today().strftime('%Y-%m-%d-%s.%f')
-            resultsOutput=f'{self.resultsOutputDir}/{topic}-{date}.csv'
-        if os.path.isfile(resultsOutput):
-            print('something is wrong will not overwrite results output')
+            thisDestination=f'{self.thisDir}/{topic}-{date}.md'
+        if os.path.isfile(thisDestination):
+            print(f'something is wrong will not overwrite {thisDestination}')
             exit(1)
-        return resultsOutput 
-
-    def check_output_destination(self, outputDestination, topic):
-        date = datetime.today().strftime('%Y-%m-%d')
-        try:
-            os.mkdir(self.outputDir)
-        except FileExistsError:
-            pass
-        if os.path.isfile(outputDestination):
-            date=datetime.today().strftime('%Y-%m-%d-%s')
-            outputDestination=f'{self.outputDir}/{topic}-{date}.md'
-        if os.path.isfile(outputDestination):
-            date=datetime.today().strftime('%Y-%m-%d-%s.%f')
-            outputDestination=f'{self.outputDir}/{topic}-{date}.md'
-        if os.path.isfile(outputDestination):
-            print('something is wrong will not overwrite output')
-            exit(1)
-        return outputDestination
-
+        return thisDestination
 
     def make_header(self, outputDestination, count_zero, topic, model):
         # make a md header like so:
@@ -98,7 +79,7 @@ class bAInchmarker:
 
     def runner(self, topic, prompt):
         date = datetime.today().strftime('%Y-%m-%d')
-        resultsOutput = self.check_results_destination(f'{self.resultsOutputDir}/{topic}-{date}.csv', topic)
+        resultsOutput = self.check_results_destination(f'{topic}-{date}.csv', self.resultsOutputDir, topic)
         with open(resultsOutput, 'w') as csvfile:
             fieldnames = ['model', 'total_duration', 'lines', 'words', 'chars', 'size', 'size_gib',
                           'size_gb', 'topic', 'prompt', 'card', 'uname', 'load_duration', 'eval_duration',
@@ -114,7 +95,7 @@ class bAInchmarker:
             count_zero += 1
 
             # Each loop we need to check to make sure our output destination is vacant
-            outputDestination = self.check_output_destination(f"{self.outputDir}/{topic}-{model['name']}-{date}.md", topic)
+            outputDestination = self.check_destination(f"{topic}-{model['name']}-{date}.md", self.outputDir, topic)
             self.make_header(outputDestination, count_zero, topic, model['name'])
 
             response = self.ollama_client.chat(model=model['name'], messages=[
@@ -123,7 +104,6 @@ class bAInchmarker:
                 'content': prompt,
               },
             ])
-
             print(response)
 
             # Write the output as a markdown file
