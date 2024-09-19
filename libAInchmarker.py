@@ -8,10 +8,47 @@ class bAInchmarker:
     def __init__(self):
         self.outputDir = self.get_env_var('outputDir','./output')
         self.resultsOutputDir = self.get_env_var('resultsOutputDir','./results')
-        self.uname = subprocess.run(["uname", "-a"], capture_output=True, text=True).stdout.rstrip()
+        self.uname_a = subprocess.run(["uname", "-a"], capture_output=True, text=True).stdout.rstrip()
+        self.uname_s = subprocess.run(["uname", "-s"], capture_output=True, text=True).stdout.rstrip()
+        self.uname_n = subprocess.run(["uname", "-n"], capture_output=True, text=True).stdout.rstrip()
+        self.uname_r = subprocess.run(["uname", "-r"], capture_output=True, text=True).stdout.rstrip()
+        self.uname_v = subprocess.run(["uname", "-v"], capture_output=True, text=True).stdout.rstrip()
+        self.uname_m = subprocess.run(["uname", "-m"], capture_output=True, text=True).stdout.rstrip()
+        self.uname_p = subprocess.run(["uname", "-p"], capture_output=True, text=True).stdout.rstrip()
+        self.uname_i = subprocess.run(["uname", "-i"], capture_output=True, text=True).stdout.rstrip()
+        self.uname_o = subprocess.run(["uname", "-o"], capture_output=True, text=True).stdout.rstrip()
         self.card = subprocess.run(["nvidia-smi", "-L"], capture_output=True, text=True).stdout.rstrip()
         self.ollama_host = self.get_env_var('OLLAMA_HOST','localhost')
         self.ollama_client = Client(host=f'http://{self.ollama_host}:11434')
+        self.fieldnames = ['name',
+                        'total_duration',
+                        'lines',
+                        'words',
+                        'chars',
+                        'size',
+                        'size_gib',
+                        'size_gb',
+                        'topic',
+                        'prompt',
+                        'card',
+                        'uname_a',
+                        'uname_s',
+                        'uname_n',
+                        'uname_r',
+                        'uname_v',
+                        'uname_m',
+                        'uname_p',
+                        'uname_i',
+                        'uname_o',
+                        'load_duration',
+                        'eval_duration',
+                        'outputDestination',
+                        'prompt_eval_duration',
+                        'created_at',
+                        'done_reason',
+                        'done',
+                        'prompt_eval_count',
+                        'eval_count']
 
     def get_env_var(self, env_var, default_value):
         try:
@@ -81,10 +118,7 @@ class bAInchmarker:
         date = datetime.today().strftime('%Y-%m-%d')
         resultsOutput = self.check_destination(f'{topic}-{date}.csv', self.resultsOutputDir, topic)
         with open(resultsOutput, 'w') as csvfile:
-            fieldnames = ['model', 'total_duration', 'lines', 'words', 'chars', 'size', 'size_gib',
-                          'size_gb', 'topic', 'prompt', 'card', 'uname', 'load_duration', 'eval_duration',
-                          'outputDestination', 'prompt_eval_duration', 'created_at', 'done_reason', 'done',
-                          'prompt_eval_count', 'eval_count']
+            fieldnames = self.fieldnames
             results_writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
             results_writer.writeheader()
         ollama_list = self.ollama_client.list()
@@ -132,10 +166,7 @@ class bAInchmarker:
 
             # Write to our results CSV file
             with open(resultsOutput, 'a', newline='') as csvfile:
-                fieldnames = ['name', 'total_duration', 'lines', 'words', 'chars', 'size', 'size_gib',
-                              'size_gb', 'topic', 'prompt', 'card', 'uname', 'load_duration',
-                              'eval_duration', 'outputDestination', 'prompt_eval_duration',
-                              'created_at', 'done_reason', 'done', 'prompt_eval_count', 'eval_count']
+                fieldnames = self.fieldnames
                 writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
                 writer.writerow({
                     'name': model['name'],
@@ -149,7 +180,16 @@ class bAInchmarker:
                     'topic': topic,
                     'prompt': prompt,
                     'card': self.card,
-                    'uname': self.uname,
+                    'uname_a': self.uname_a,
+                    'uname_s': self.uname_s,
+                    'uname_n': self.uname_n,
+                    'uname_r': self.uname_r,
+                    'uname_v': self.uname_v,
+                    'uname_m': self.uname_m,
+                    'uname_p': self.uname_p,
+                    'uname_i': self.uname_i,
+                    'uname_o': self.uname_o,
+                    'uname_replaceMe': self.uname_replaceMe,
                     'load_duration': load_duration,
                     'eval_duration': eval_duration,
                     'outputDestination': outputDestination,
