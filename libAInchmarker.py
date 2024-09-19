@@ -1,18 +1,52 @@
 #!/usr/bin/env python3
-import os, sys, csv, subprocess, tempfile
+import os, sys, csv, subprocess
 from dotenv import load_dotenv
 from datetime import datetime
 from ollama import Client
 
 class bAInchmarker:
     def __init__(self):
-    # date = datetime.today().strftime('%Y-%m-%d')
         self.outputDir = self.get_env_var('outputDir','./output')
         self.resultsOutputDir = self.get_env_var('resultsOutputDir','./results')
-        self.uname = subprocess.run(["uname", "-a"], capture_output=True, text=True).stdout.rstrip()
+        self.uname_s = subprocess.run(["uname", "-s"], capture_output=True, text=True).stdout.rstrip()
+        self.uname_n = subprocess.run(["uname", "-n"], capture_output=True, text=True).stdout.rstrip()
+        self.uname_r = subprocess.run(["uname", "-r"], capture_output=True, text=True).stdout.rstrip()
+        self.uname_v = subprocess.run(["uname", "-v"], capture_output=True, text=True).stdout.rstrip()
+        self.uname_m = subprocess.run(["uname", "-m"], capture_output=True, text=True).stdout.rstrip()
+        self.uname_p = subprocess.run(["uname", "-p"], capture_output=True, text=True).stdout.rstrip()
+        self.uname_i = subprocess.run(["uname", "-i"], capture_output=True, text=True).stdout.rstrip()
+        self.uname_o = subprocess.run(["uname", "-o"], capture_output=True, text=True).stdout.rstrip()
         self.card = subprocess.run(["nvidia-smi", "-L"], capture_output=True, text=True).stdout.rstrip()
         self.ollama_host = self.get_env_var('OLLAMA_HOST','localhost')
         self.ollama_client = Client(host=f'http://{self.ollama_host}:11434')
+        self.fieldnames = ['name',
+                        'total_duration',
+                        'lines',
+                        'words',
+                        'chars',
+                        'size',
+                        'size_gib',
+                        'size_gb',
+                        'topic',
+                        'prompt',
+                        'card',
+                        'uname_s',
+                        'uname_n',
+                        'uname_r',
+                        'uname_v',
+                        'uname_m',
+                        'uname_p',
+                        'uname_i',
+                        'uname_o',
+                        'load_duration',
+                        'eval_duration',
+                        'outputDestination',
+                        'prompt_eval_duration',
+                        'created_at',
+                        'done_reason',
+                        'done',
+                        'prompt_eval_count',
+                        'eval_count']
 
     def get_env_var(self, env_var, default_value):
         try:
@@ -29,44 +63,26 @@ class bAInchmarker:
             this_env_var = default_value
         return this_env_var
 
-
     def usage(self):
         print(f"Don't forget the quotes!\nusage:\n{sys.argv[0]} 'topic' 'prompt'")
 
-    def check_results_destination(self, resultsOutput, topic):
+    def check_destination(self, thisName, thisDir, topic):
+        thisDestination = f'{thisDir}/{thisName}'
         date = datetime.today().strftime('%Y-%m-%d')
         try:
-            os.mkdir(self.resultsOutputDir)
+            os.mkdir(thisDir)
         except FileExistsError:
             pass
-        if os.path.isfile(resultsOutput):
+        if os.path.isfile(thisDestination):
             date=datetime.today().strftime('%Y-%m-%d-%s')
-            resultsOutput=f'{self.resultsOutputDir}/{topic}-{date}.csv'
-        if os.path.isfile(resultsOutput):
+            thisDestination=f'{thisDir}/{topic}-{date}.md'
+        if os.path.isfile(thisDestination):
             date=datetime.today().strftime('%Y-%m-%d-%s.%f')
-            resultsOutput=f'{self.resultsOutputDir}/{topic}-{date}.csv'
-        if os.path.isfile(resultsOutput):
-            print('something is wrong will not overwrite results output')
+            thisDestination=f'{thisDir}/{topic}-{date}.md'
+        if os.path.isfile(thisDestination):
+            print(f'something is wrong will not overwrite {thisDestination}')
             exit(1)
-        return resultsOutput 
-
-    def check_output_destination(self, outputDestination, topic):
-        date = datetime.today().strftime('%Y-%m-%d')
-        try:
-            os.mkdir(self.outputDir)
-        except FileExistsError:
-            pass
-        if os.path.isfile(outputDestination):
-            date=datetime.today().strftime('%Y-%m-%d-%s')
-            outputDestination=f'{self.outputDir}/{topic}-{date}.md'
-        if os.path.isfile(outputDestination):
-            date=datetime.today().strftime('%Y-%m-%d-%s.%f')
-            outputDestination=f'{self.outputDir}/{topic}-{date}.md'
-        if os.path.isfile(outputDestination):
-            print('something is wrong will not overwrite output')
-            exit(1)
-        return outputDestination
-
+        return thisDestination
 
     def make_header(self, outputDestination, count_zero, topic, model):
         # make a md header like so:
@@ -86,31 +102,23 @@ class bAInchmarker:
         # can be deleted in the future, but it is interesting
         tmpdirname = subprocess.run(["mktemp", "-d"], capture_output=True, text=True).stdout.rstrip()
         tmp_file = tmpdirname + "/tmpfile"
-        print(tmp_file)
         with open(tmp_file, 'a+') as tmpfile:
             tmpfile.write(response['message']['content'])
             tmpfile.seek(0)
-            echo1 = subprocess.run(["echo", "wc", "--lines", tmp_file], capture_output=True, text=True).stdout.rstrip()
-            print("echo1" + echo1)
             lines = subprocess.run(["wc", "--lines", tmp_file], capture_output=True, text=True).stdout.rstrip()
             words = subprocess.run(["wc", "--words", tmp_file], capture_output=True, text=True).stdout.rstrip()
             chars = subprocess.run(["wc", "--chars", tmp_file], capture_output=True, text=True).stdout.rstrip()
-            print(lines)
             print(f'lines = {lines}')
             print(f'words = {words}')
             print(f'chars = {chars}')
-            tmpfile.seek(0)
-            print(tmpfile.read())
 
     def runner(self, topic, prompt):
         date = datetime.today().strftime('%Y-%m-%d')
-        resultsOutput = self.check_results_destination(f'{self.resultsOutputDir}/{topic}-{date}.csv', topic)
-        with open(resultsOutput, 'w', newline='') as csvfile:
-            results_writer = csv.writer(csvfile, delimiter=',',
-                quotechar='"', quoting=csv.QUOTE_MINIMAL)
-            results_writer.writerow(['model', 'total_duration', 'lines', 'words', 'chars', 'size', 'size_gib',
-            'size_gb', 'topic', 'prompt', 'card', 'uname', 'load_duration', 'eval_duration', 'outputDestination',
-            'prompt_eval_duration', 'created_at', 'done_reason', 'done', 'prompt_eval_count', 'eval_count'])
+        resultsOutput = self.check_destination(f'{topic}-{date}.csv', self.resultsOutputDir, topic)
+        with open(resultsOutput, 'w') as csvfile:
+            fieldnames = self.fieldnames
+            results_writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+            results_writer.writeheader()
         ollama_list = self.ollama_client.list()
         count_zero = 0
 
@@ -119,7 +127,7 @@ class bAInchmarker:
             count_zero += 1
 
             # Each loop we need to check to make sure our output destination is vacant
-            outputDestination = self.check_output_destination(f"{self.outputDir}/{topic}-{model['name']}-{date}.md", topic)
+            outputDestination = self.check_destination(f"{topic}-{model['name']}-{date}.md", self.outputDir, topic)
             self.make_header(outputDestination, count_zero, topic, model['name'])
 
             response = self.ollama_client.chat(model=model['name'], messages=[
@@ -128,7 +136,6 @@ class bAInchmarker:
                 'content': prompt,
               },
             ])
-
             print(response)
 
             # Write the output as a markdown file
@@ -157,8 +164,35 @@ class bAInchmarker:
 
             # Write to our results CSV file
             with open(resultsOutput, 'a', newline='') as csvfile:
-                results_writer = csv.writer(csvfile, delimiter=',',
-                    quotechar='"', quoting=csv.QUOTE_MINIMAL)
-                results_writer.writerow([model['name'], total_duration, lines, words, chars, size, size_gib,
-                size_gb, topic, prompt, self.card, self.uname, load_duration, eval_duration, outputDestination,
-                prompt_eval_duration, created_at, done_reason, done, prompt_eval_count, eval_count])
+                fieldnames = self.fieldnames
+                writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+                writer.writerow({
+                    'name': model['name'],
+                    'total_duration': total_duration,
+                    'lines': lines,
+                    'words': words,
+                    'chars': chars,
+                    'size': size,
+                    'size_gib': size_gib,
+                    'size_gb': size_gb,
+                    'topic': topic,
+                    'prompt': prompt,
+                    'card': self.card,
+                    'uname_s': self.uname_s,
+                    'uname_n': self.uname_n,
+                    'uname_r': self.uname_r,
+                    'uname_v': self.uname_v,
+                    'uname_m': self.uname_m,
+                    'uname_p': self.uname_p,
+                    'uname_i': self.uname_i,
+                    'uname_o': self.uname_o,
+                    'load_duration': load_duration,
+                    'eval_duration': eval_duration,
+                    'outputDestination': outputDestination,
+                    'prompt_eval_duration': prompt_eval_duration,
+                    'created_at': created_at,
+                    'done_reason': done_reason,
+                    'done': done,
+                    'prompt_eval_count': prompt_eval_count,
+                    'eval_count': eval_count
+                })
