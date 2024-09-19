@@ -10,7 +10,7 @@ elif len(sys.argv) == 1:
     topic = bain.get_env_var('topic','godParticle')
     prompt = bain.get_env_var('prompt',"write me a blog post about the god particle")
     time.sleep(1)
-    print('ctrl-C to stop now or proceeding with the default topic and prompt'
+    print('ctrl-C to stop now or proceeding with the default topic and prompt')
     time.sleep(1)
     print(f'topic = {topic}'
     time.sleep(1)
