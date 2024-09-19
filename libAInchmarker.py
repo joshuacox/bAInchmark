@@ -80,27 +80,27 @@ class bAInchmarker:
             print("Error: could not write file " + outputDestination)
             exit(1)
 
-        def tempDebug():
-            # DEPRECATED
-            # this function was used to see if wc got different results than the python did in counting  
-            # can be deleted in the future, but it is interesting
-            tmpdirname = subprocess.run(["mktemp", "-d"], capture_output=True, text=True).stdout.rstrip()
-            tmp_file = tmpdirname + "/tmpfile"
-            print(tmp_file)
-            with open(tmp_file, 'a+') as tmpfile:
-                tmpfile.write(response['message']['content'])
-                tmpfile.seek(0)
-                echo1 = subprocess.run(["echo", "wc", "--lines", tmp_file], capture_output=True, text=True).stdout.rstrip()
-                print("echo1" + echo1)
-                lines = subprocess.run(["wc", "--lines", tmp_file], capture_output=True, text=True).stdout.rstrip()
-                words = subprocess.run(["wc", "--words", tmp_file], capture_output=True, text=True).stdout.rstrip()
-                chars = subprocess.run(["wc", "--chars", tmp_file], capture_output=True, text=True).stdout.rstrip()
-                print(lines)
-                print(f'lines = {lines}')
-                print(f'words = {words}')
-                print(f'chars = {chars}')
-                tmpfile.seek(0)
-                print(tmpfile.read())
+    def tempDebug():
+        # DEPRECATED
+        # this function was used to see if wc got different results than the python did in counting  
+        # can be deleted in the future, but it is interesting
+        tmpdirname = subprocess.run(["mktemp", "-d"], capture_output=True, text=True).stdout.rstrip()
+        tmp_file = tmpdirname + "/tmpfile"
+        print(tmp_file)
+        with open(tmp_file, 'a+') as tmpfile:
+            tmpfile.write(response['message']['content'])
+            tmpfile.seek(0)
+            echo1 = subprocess.run(["echo", "wc", "--lines", tmp_file], capture_output=True, text=True).stdout.rstrip()
+            print("echo1" + echo1)
+            lines = subprocess.run(["wc", "--lines", tmp_file], capture_output=True, text=True).stdout.rstrip()
+            words = subprocess.run(["wc", "--words", tmp_file], capture_output=True, text=True).stdout.rstrip()
+            chars = subprocess.run(["wc", "--chars", tmp_file], capture_output=True, text=True).stdout.rstrip()
+            print(lines)
+            print(f'lines = {lines}')
+            print(f'words = {words}')
+            print(f'chars = {chars}')
+            tmpfile.seek(0)
+            print(tmpfile.read())
 
     def runner(self, topic, prompt):
         date = datetime.today().strftime('%Y-%m-%d')
