@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-import os, sys, csv, subprocess
+import os, sys, csv, subprocess, random
 from dotenv import load_dotenv
 from datetime import datetime
 from ollama import Client
