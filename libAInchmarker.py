@@ -120,6 +120,7 @@ class bAInchmarker:
             results_writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
             results_writer.writeheader()
         ollama_list = self.ollama_client.list()
+        random.shuffle(ollama_list)
         count_zero = 0
 
         for model in ollama_list['models']:
