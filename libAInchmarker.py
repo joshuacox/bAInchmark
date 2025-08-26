@@ -124,15 +124,16 @@ class bAInchmarker:
         random.shuffle(this_list)
         count_zero = 0
 
-        #for model in ollama_list['models']:
         for model in this_list:
             # Pre increment this so that we begin with 1 for our first ouput
             count_zero += 1
+            modified_modelname_filename = model['name'].replace("/", "_")
 
             # Each loop we need to check to make sure our output destination is vacant
-            print(f"trying {topic}-{model['name']}-{date}.md")
-            outputDestination = self.check_destination(f"{topic}-{model['name']}-{date}.md", self.outputDir, topic)
-            self.make_header(outputDestination, count_zero, topic, model['name'])
+            #print(f"trying {topic}-{model['name']}-{date}.md")
+            print(f"trying {topic}-{modified_modelname_filename}-{date}.md")
+            outputDestination = self.check_destination(f"{topic}-{modified_modelname_filename}-{date}.md", self.outputDir, topic)
+            self.make_header(outputDestination, count_zero, topic, modified_modelname_filename)
 
             response = self.ollama_client.chat(model=model['name'], messages=[
               {
