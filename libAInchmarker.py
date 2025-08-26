@@ -127,6 +127,7 @@ class bAInchmarker:
             count_zero += 1
 
             # Each loop we need to check to make sure our output destination is vacant
+            print(f"trying {topic}-{model['name']}-{date}.md")
             outputDestination = self.check_destination(f"{topic}-{model['name']}-{date}.md", self.outputDir, topic)
             self.make_header(outputDestination, count_zero, topic, model['name'])
 
