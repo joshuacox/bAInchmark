@@ -91,7 +91,7 @@ class bAInchmarker:
         try:
             with open(outputDestination, 'a+') as file:
                 file.write(f"# {topic} #{count_zero}\n\n")
-                file.write(f"### writen by {model}\n\n")
+                file.write(f"### written by {model}\n\n")
         except IOError:
             print("Error: could not write file " + outputDestination)
             exit(1)
