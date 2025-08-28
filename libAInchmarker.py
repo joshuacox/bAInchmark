@@ -135,17 +135,21 @@ class bAInchmarker:
             outputDestination = self.check_destination(f"{topic}-{modified_modelname_filename}-{date}.md", self.outputDir, topic)
             self.make_header(outputDestination, count_zero, topic, modified_modelname_filename)
 
-            response = self.ollama_client.chat(model=model['name'], messages=[
-              {
-                'role': 'user',
-                'content': prompt,
-              },
-            ])
-            print(response)
 
-            # Write the output as a markdown file
-            with open(outputDestination, 'a+') as file:
-                file.write(response['message']['content'])
+            try:
+                response = self.ollama_client.chat(model=model['name'], messages=[
+                {
+                    'role': 'user',
+                    'content': prompt,
+                },
+                ])
+                print(response)
+
+                # Write the output as a markdown file
+                with open(outputDestination, 'a+') as file:
+                    file.write(response['message']['content'])
+            except IOError:
+                print(f"Error: could not use model {model['name']}")
 
             # Gather data
             # we divide durations by 1_000_000_000 to get it in seconds
