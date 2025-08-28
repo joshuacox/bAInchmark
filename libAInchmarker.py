@@ -125,18 +125,18 @@ class bAInchmarker:
         count_zero = 0
 
         for model in this_list:
-            # Pre increment this so that we begin with 1 for our first ouput
-            count_zero += 1
-            modified_modelname_filename = model['name'].replace("/", "_")
-
-            # Each loop we need to check to make sure our output destination is vacant
-            #print(f"trying {topic}-{model['name']}-{date}.md")
-            print(f"trying {topic}-{modified_modelname_filename}-{date}.md")
-            outputDestination = self.check_destination(f"{topic}-{modified_modelname_filename}-{date}.md", self.outputDir, topic)
-            self.make_header(outputDestination, count_zero, topic, modified_modelname_filename)
 
 
             try:
+                # Pre increment this so that we begin with 1 for our first ouput
+                count_zero += 1
+                modified_modelname_filename = model['name'].replace("/", "_")
+
+                # Each loop we need to check to make sure our output destination is vacant
+                #print(f"trying {topic}-{model['name']}-{date}.md")
+                print(f"trying count {count_zero} {topic}-{modified_modelname_filename}-{date}.md")
+                outputDestination = self.check_destination(f"{topic}-{modified_modelname_filename}-{date}.md", self.outputDir, topic)
+                self.make_header(outputDestination, count_zero, topic, modified_modelname_filename)
                 response = self.ollama_client.chat(model=model['name'], messages=[
                 {
                     'role': 'user',
@@ -151,57 +151,57 @@ class bAInchmarker:
             except IOError:
                 print(f"Error: could not use model {model['name']}")
 
-            # Gather data
-            # we divide durations by 1_000_000_000 to get it in seconds
-            # to be more human readable
-            # print(float(total_duration) / 1_000_000_000.0)
-            load_duration = response['load_duration'] / 1_000_000_000.0
-            eval_duration = response['eval_duration'] / 1_000_000_000.0
-            total_duration = response['total_duration'] / 1_000_000_000.0
-            prompt_eval_duration = response['prompt_eval_duration'] / 1_000_000_000.0
-            size = model['size']
-            size_gb = ( model['size'] / ( 10 ** 9 ))
-            size_gib = ( model['size'] / ( 2 ** 30 ))
-            lines = len(response['message']['content'].split('\n'))
-            words = len(response['message']['content'].split())
-            chars = len(response['message']['content'])
-            created_at = response['created_at']
-            done_reason = response['done_reason']
-            done = response['done']
-            prompt_eval_count = response['prompt_eval_count']
-            eval_count = response['eval_count']
+                # Gather data
+                # we divide durations by 1_000_000_000 to get it in seconds
+                # to be more human readable
+                # print(float(total_duration) / 1_000_000_000.0)
+                load_duration = response['load_duration'] / 1_000_000_000.0
+                eval_duration = response['eval_duration'] / 1_000_000_000.0
+                total_duration = response['total_duration'] / 1_000_000_000.0
+                prompt_eval_duration = response['prompt_eval_duration'] / 1_000_000_000.0
+                size = model['size']
+                size_gb = ( model['size'] / ( 10 ** 9 ))
+                size_gib = ( model['size'] / ( 2 ** 30 ))
+                lines = len(response['message']['content'].split('\n'))
+                words = len(response['message']['content'].split())
+                chars = len(response['message']['content'])
+                created_at = response['created_at']
+                done_reason = response['done_reason']
+                done = response['done']
+                prompt_eval_count = response['prompt_eval_count']
+                eval_count = response['eval_count']
 
-            # Write to our results CSV file
-            with open(resultsOutput, 'a', newline='') as csvfile:
-                fieldnames = self.fieldnames
-                writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-                writer.writerow({
-                    'name': model['name'],
-                    'total_duration': total_duration,
-                    'lines': lines,
-                    'words': words,
-                    'chars': chars,
-                    'size': size,
-                    'size_gib': size_gib,
-                    'size_gb': size_gb,
-                    'topic': topic,
-                    'prompt': prompt,
-                    'card': self.card,
-                    'uname_s': self.uname_s,
-                    'uname_n': self.uname_n,
-                    'uname_r': self.uname_r,
-                    'uname_v': self.uname_v,
-                    'uname_m': self.uname_m,
-                    'uname_p': self.uname_p,
-                    'uname_i': self.uname_i,
-                    'uname_o': self.uname_o,
-                    'load_duration': load_duration,
-                    'eval_duration': eval_duration,
-                    'outputDestination': outputDestination,
-                    'prompt_eval_duration': prompt_eval_duration,
-                    'created_at': created_at,
-                    'done_reason': done_reason,
-                    'done': done,
-                    'prompt_eval_count': prompt_eval_count,
-                    'eval_count': eval_count
-                })
+                # Write to our results CSV file
+                with open(resultsOutput, 'a', newline='') as csvfile:
+                    fieldnames = self.fieldnames
+                    writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
+                    writer.writerow({
+                        'name': model['name'],
+                        'total_duration': total_duration,
+                        'lines': lines,
+                        'words': words,
+                        'chars': chars,
+                        'size': size,
+                        'size_gib': size_gib,
+                        'size_gb': size_gb,
+                        'topic': topic,
+                        'prompt': prompt,
+                        'card': self.card,
+                        'uname_s': self.uname_s,
+                        'uname_n': self.uname_n,
+                        'uname_r': self.uname_r,
+                        'uname_v': self.uname_v,
+                        'uname_m': self.uname_m,
+                        'uname_p': self.uname_p,
+                        'uname_i': self.uname_i,
+                        'uname_o': self.uname_o,
+                        'load_duration': load_duration,
+                        'eval_duration': eval_duration,
+                        'outputDestination': outputDestination,
+                        'prompt_eval_duration': prompt_eval_duration,
+                        'created_at': created_at,
+                        'done_reason': done_reason,
+                        'done': done,
+                        'prompt_eval_count': prompt_eval_count,
+                        'eval_count': eval_count
+                    })
